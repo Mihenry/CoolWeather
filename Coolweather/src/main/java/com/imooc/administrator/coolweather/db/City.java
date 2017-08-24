@@ -11,6 +11,7 @@ public class City extends DataSupport {
     private int id;
     private String cityName;
     private int cityCode;//城市编码
+    private int provinceId;
 
     public int getId() {
         return id;
@@ -34,5 +35,13 @@ public class City extends DataSupport {
 
     public void setCityCode(int cityCode) {
         this.cityCode = cityCode;
+    }
+
+    public int getProvinceId() {
+        return provinceId;
+    }
+
+    public void setProvinceId(int provinceId) {
+        this.provinceId = provinceId;
     }
 }
