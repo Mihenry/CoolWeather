@@ -2,16 +2,21 @@ package com.imooc.administrator.coolweather.util;
 
 import android.text.TextUtils;
 
+import com.google.gson.Gson;
+import com.google.gson.JsonObject;
 import com.imooc.administrator.coolweather.db.City;
 import com.imooc.administrator.coolweather.db.County;
 import com.imooc.administrator.coolweather.db.Province;
+import com.imooc.administrator.coolweather.gson.Weather;
 
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
 /**
- * Created by Administrator on 2017/8/23.
+ * 服务器返回的JSON数据格式为：
+ * jsonObject：{"username":"huangwuyi","sex":"男","QQ":"413425430","Min.score":99,"nickname":"梦中心境"}
+ * 是一个字符串，要解析这个字符串得到我们想要的数据
  */
 
 public class Utility {
@@ -83,5 +88,22 @@ public class Utility {
             e.printStackTrace();
         }
         return false;
+    }
+
+    /**
+     * 将返回的JSON数据解析成Weather实体类
+     */
+    public static Weather handleWeatherResponse(String response){
+        try {
+            JSONObject jsonObject=new JSONObject(response);
+            JSONArray jsonArray=jsonObject.getJSONArray("HeWeather");
+            /**???*/
+            String weatherContent=jsonArray.getJSONObject(0).toString();
+            Weather weather=new Gson().fromJson(weatherContent,Weather.class);
+            return weather;
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+        return null;
     }
 }
