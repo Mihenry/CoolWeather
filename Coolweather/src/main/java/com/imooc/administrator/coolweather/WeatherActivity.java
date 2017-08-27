@@ -1,5 +1,6 @@
 package com.imooc.administrator.coolweather;
 
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.graphics.Color;
 import android.os.Build;
@@ -22,6 +23,7 @@ import android.widget.Toast;
 import com.bumptech.glide.Glide;
 import com.imooc.administrator.coolweather.gson.Forecast;
 import com.imooc.administrator.coolweather.gson.Weather;
+import com.imooc.administrator.coolweather.service.AutoUpdateWeatherService;
 import com.imooc.administrator.coolweather.util.HttpUtil;
 import com.imooc.administrator.coolweather.util.Utility;
 
@@ -120,6 +122,9 @@ public class WeatherActivity extends AppCompatActivity {
                         if (weather!=null&&weather.status.equals("ok")){
                             SharedPreferences.Editor editor=PreferenceManager
                                     .getDefaultSharedPreferences(WeatherActivity.this).edit();
+                            /**
+                             * 存进SharedPreferences文件的是JSON格式的字符串数据
+                             */
                             editor.putString("weather",responseText);
                             editor.apply();
 
@@ -226,6 +231,9 @@ public class WeatherActivity extends AppCompatActivity {
         sport_text.setText(sport);
 
         weather_layout.setVisibility(View.VISIBLE);
+
+        Intent intent=new Intent(this, AutoUpdateWeatherService.class);
+        startService(intent);
 
     }
 
