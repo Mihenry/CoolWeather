@@ -6,9 +6,13 @@ import android.os.Build;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.support.annotation.Nullable;
+import android.support.v4.view.GravityCompat;
+import android.support.v4.widget.DrawerLayout;
+import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.app.AppCompatActivity;
 import android.view.LayoutInflater;
 import android.view.View;
+import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ScrollView;
@@ -43,6 +47,10 @@ public class WeatherActivity extends AppCompatActivity {
     private TextView comfort_text,car_wash_text,sport_text;
     private ImageView bing_pic_img;
     private SharedPreferences prefs;
+    public SwipeRefreshLayout swipe_refresh;
+    private String mWeatherId;
+    private Button bt_nav;
+    public DrawerLayout mDrawerLayout;
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -63,23 +71,30 @@ public class WeatherActivity extends AppCompatActivity {
 
         init();
         /**将从服务器请求得到的天气数据存到SharedPreferences文件中*/
-        SharedPreferences prefs= PreferenceManager.getDefaultSharedPreferences(this);
+        prefs= PreferenceManager.getDefaultSharedPreferences(this);
 
         String weatherString=prefs.getString("weather",null);
         /**若得到的数据不为空，则无需请求服务器，直接将json格式的字符串数据解析成weather对象，给控件赋值即可*/
         if (weatherString!=null){
             Weather weather= Utility.handleWeatherResponse(weatherString);
+            mWeatherId=weather.basic.weatherId;
             showWeatherInfo(weather);
         }else {
-            String weatherId=getIntent().getStringExtra("weatherId");
-            requestWeather(weatherId);
+            mWeatherId=getIntent().getStringExtra("weatherId");
+            requestWeather(mWeatherId);
             weather_layout.setVisibility(View.INVISIBLE);
         }
+        swipe_refresh.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
+            @Override
+            public void onRefresh() {
+                requestWeather(mWeatherId);
+            }
+        });
         loadBackgroundPicture();
     }
 
 
-    private void requestWeather(String weatherId) {
+    public void requestWeather(String weatherId) {
         String weatherAddress="http://guolin.tech/api/weather?cityid="
                 +weatherId+"&key=3e591e7a8ae745cdacfa5ec8346190ad";
         HttpUtil.sendOkHttpRequest(weatherAddress, new Callback() {
@@ -89,6 +104,8 @@ public class WeatherActivity extends AppCompatActivity {
                     @Override
                     public void run() {
                         Toast.makeText(WeatherActivity.this,"连接失败！",Toast.LENGTH_SHORT).show();
+                        /**表示刷新事件结束，并隐藏刷新进度条*/
+                        swipe_refresh.setRefreshing(false);
                     }
                 });
             }
@@ -114,11 +131,27 @@ public class WeatherActivity extends AppCompatActivity {
                         }else {
                             Toast.makeText(WeatherActivity.this,"获取天气信息失败！",Toast.LENGTH_SHORT).show();
                         }
+                        /**表示刷新事件结束，并隐藏刷新进度条*/
+                        swipe_refresh.setRefreshing(false);
                     }
                 });
             }
         });
+
+        /**
+         * 加载背景图片
+         */
         loadBackgroundPicture();
+
+        /**
+         * 点击导航按钮，显示滑动侧边栏
+         */
+        bt_nav.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                mDrawerLayout.openDrawer(GravityCompat.START);
+            }
+        });
     }
 
     /**
@@ -137,6 +170,9 @@ public class WeatherActivity extends AppCompatActivity {
         car_wash_text= (TextView) findViewById(R.id.car_wash_text);
         sport_text= (TextView) findViewById(R.id.sport_text);
         bing_pic_img= (ImageView) findViewById(R.id.bing_pic_img);
+        swipe_refresh= (SwipeRefreshLayout) findViewById(R.id.swipe_refresh);
+        bt_nav= (Button) findViewById(R.id.bt_nav);
+        mDrawerLayout= (DrawerLayout) findViewById(R.id.drawerLayout);
     }
 
     /**

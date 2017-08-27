@@ -10,26 +10,46 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:scaleType="centerCrop"/>
-    <!--android:scrollbars="none" 滚动条隐藏-->
-    <!--android:overScrollMode="never" 删除ScrollView拉到尽头（顶部、底部），然后继续拉出现的阴影效果 -->
-    <ScrollView
-        android:id="@+id/weather_layout"
+    <android.support.v4.widget.DrawerLayout
+        android:id="@+id/drawerLayout"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:scrollbars="none"
-        android:overScrollMode="never">
-        <!--android:fitsSystemWindows="true" 为系统状态栏留出空间（ps:否则系统状态栏会和activity紧贴着，不美观）-->
-        <LinearLayout
-            android:orientation="vertical"
+        android:layout_height="match_parent">
+        <!--SwipeRefreshLayout 下拉刷新布局，自带下拉刷新功能-->
+        <android.support.v4.widget.SwipeRefreshLayout
+            android:id="@+id/swipe_refresh"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:fitsSystemWindows="true">
-            <include layout="@layout/title"></include>
-            <include layout="@layout/now"></include>
-            <include layout="@layout/forecast"></include>
-            <include layout="@layout/aqi"></include>
-            <include layout="@layout/suggestion"></include>
-        </LinearLayout>
-    </ScrollView>
+            android:layout_height="match_parent">
+            <!--android:scrollbars="none" 滚动条隐藏-->
+            <!--android:overScrollMode="never" 删除ScrollView拉到尽头（顶部、底部），然后继续拉出现的阴影效果 -->
+            <ScrollView
+                android:id="@+id/weather_layout"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:scrollbars="none"
+                android:overScrollMode="never">
+                <!--android:fitsSystemWindows="true" 为系统状态栏留出空间（ps:否则系统状态栏会和activity紧贴着，不美观）-->
+                <LinearLayout
+                    android:orientation="vertical"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:fitsSystemWindows="true">
+                    <include layout="@layout/title"/>
+                    <include layout="@layout/now"/>
+                    <include layout="@layout/forecast"/>
+                    <include layout="@layout/aqi"/>
+                    <include layout="@layout/suggestion"/>
+                </LinearLayout>
+            </ScrollView>
+        </android.support.v4.widget.SwipeRefreshLayout>
+        <!--android:layout_gravity="start" 滑动功能菜单从哪侧出现，必须设置这个功能-->
+        <fragment
+            android:id="@+id/choose_area_fragment"
+            android:name="com.imooc.administrator.coolweather.ChooseAreaFragment"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_gravity="start"/>
+    </android.support.v4.widget.DrawerLayout>
+
+
 
 </FrameLayout>

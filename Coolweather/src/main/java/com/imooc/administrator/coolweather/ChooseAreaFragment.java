@@ -102,11 +102,30 @@ public class ChooseAreaFragment extends Fragment {
                     selectedCity=cityList.get(position);
                     queryCounties();
                 }else if (currentLevel==LEVEL_COUNTY){
+                    /**
+                     * 因为有两种方式来打开选择地域：
+                     * 一、直接在MainActivity中选择地域
+                     * 二、直接在滑动侧边菜单栏中选择地域
+                     * 对于情况一：
+                     *     选择了区域以后，需要跳转到WeatherActivity中
+                     * 而对于情况二：
+                     *     因为本身就处于WeatherActivity中，无需进行跳转，只需要再选择地域以后，关闭滑动
+                     * 侧边栏，停止刷新，隐藏刷新进度条，显示天气信息即可
+                     */
                     selectedCounty=countyList.get(position);
-                    Intent intent=new Intent(getActivity(),WeatherActivity.class);
-                    intent.putExtra("weatherId",selectedCounty.getWeatherId());
-                    startActivity(intent);
-                    getActivity().finish();
+                    int weatherId=selectedCounty.getWeatherId();
+                    if (getActivity() instanceof MainActivity){
+                        Intent intent=new Intent(getActivity(),WeatherActivity.class);
+                        intent.putExtra("weatherId",weatherId);
+                        startActivity(intent);
+                        getActivity().finish();
+                    }else if (getActivity() instanceof WeatherActivity){
+                        WeatherActivity activity= (WeatherActivity) getActivity();
+                        activity.mDrawerLayout.closeDrawers();
+                        activity.swipe_refresh.setRefreshing(false);
+                        activity.requestWeather(weatherId+"");
+                    }
+
                 }
             }
         });
